@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NurseAI - Your Intelligent Nursing Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { height: 100%; width: 100%; overflow: hidden; }
+      html.light, html.light body { background-color: #ffffff !important; color: #000000; }
+      html.dark, html.dark body { background-color: #1a1a1a !important; color: #ffffff; }
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 30%, #ede9fe 70%, #f3e8ff 100%);
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+      ::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+      .animate-fade { animation: fadeIn 0.35s ease-out forwards; }
+      .header {
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid #e0e7ff;
+        padding: 12px 20px;
+        flex-shrink: 0;
+        z-index: 10;
+        box-shadow: 0 1px 3px rgba(99,102,241,0.06);
+      }
+      .header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+      .header-left { display: flex; align-items: center; gap: 12px; }
+      .logo {
+        width: 42px; height: 42px;
+        background: linear-gradient(135deg, #6366f1, #9333ea);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+      }
+      .header-title {
+        font-size: 22px; font-weight: 800;
+        background: linear-gradient(135deg, #4f46e5, #9333ea);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .header-sub { font-size: 11px; color: #6b7280; font-weight: 500; }
+      .header-badges { display: flex; gap: 8px; }
+      .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+      .badge-green { background: #dcfce7; color: #15803d; }
+      .badge-indigo { background: #e0e7ff; color: #4338ca; }
+      .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 2s ease-in-out infinite; }
+      .chat-area { flex: 1; overflow-y: auto; padding: 20px 16px; scroll-behavior: smooth; }
+      .chat-inner { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+      .msg-row { display: flex; gap: 10px; max-width: 88%; animation: fadeIn 0.35s ease-out forwards; }
+      .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+      .msg-row.ai { align-self: flex-start; }
+      .msg-avatar {
+        width: 34px; height: 34px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .msg-avatar.ai-avatar { background: linear-gradient(135deg, #6366f1, #9333ea); }
+      .msg-avatar.user-avatar { background: linear-gradient(135deg, #34d399, #14b8a6); }
+      .msg-bubble {
+        padding: 12px 16px; border-radius: 18px;
+        font-size: 13.5px; line-height: 1.65;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        word-wrap: break-word; overflow-wrap: break-word;
+      }
+      .msg-bubble.ai-bubble { background: #fff; border: 1px solid #f1f5f9; color: #374151; border-top-left-radius: 4px; }
+      .msg-bubble.user-bubble { background: linear-gradient(135deg, #6366f1, #9333ea); color: #fff; border-top-right-radius: 4px; }
+      .msg-time { font-size: 10px; margin-top: 6px; opacity: 0.6; }
+      .msg-bubble strong { font-weight: 700; }
+      .typing-row { display: flex; gap: 10px; align-self: flex-start; animation: fadeIn 0.3s ease-out; }
+      .typing-dots { display: flex; gap: 4px; padding: 14px 18px; background: #fff; border-radius: 18px; border-top-left-radius: 4px; border: 1px solid #f1f5f9; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+      .typing-dot { width: 8px; height: 8px; border-radius: 50%; background: #818cf8; animation: bounce 1.4s ease-in-out infinite; }
+      .typing-dot:nth-child(2) { animation-delay: 0.16s; }
+      .typing-dot:nth-child(3) { animation-delay: 0.32s; }
+      .topics-bar { padding: 0 16px 6px; flex-shrink: 0; }
+      .topics-inner { max-width: 900px; margin: 0 auto; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; -ms-overflow-style: none; scrollbar-width: none; }
+      .topics-inner::-webkit-scrollbar { display: none; }
+      .topic-btn {
+        flex-shrink: 0; padding: 6px 14px;
+        background: #fff; border: 1px solid #e0e7ff; border-radius: 9999px;
+        font-size: 12px; font-weight: 600; color: #4338ca;
+        cursor: pointer; transition: all 0.2s;
+        box-shadow: 0 1px 3px rgba(99,102,241,0.06);
+        font-family: inherit;
+      }
+      .topic-btn:hover { background: #eef2ff; border-color: #a5b4fc; box-shadow: 0 2px 8px rgba(99,102,241,0.12); transform: translateY(-1px); }
+      .input-area {
+        background: rgba(255,255,255,0.88);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid #e0e7ff;
+        padding: 12px 16px 14px; flex-shrink: 0;
+      }
+      .input-inner { max-width: 900px; margin: 0 auto; }
+      .input-row { display: flex; gap: 8px; }
+      .chat-input {
+        flex: 1; padding: 12px 16px;
+        background: #f9fafb; border: 1.5px solid #e5e7eb; border-radius: 14px;
+        font-size: 14px; font-family: inherit; outline: none;
+        transition: all 0.2s; color: #1f2937;
+      }
+      .chat-input::placeholder { color: #9ca3af; }
+      .chat-input:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(129,140,248,0.15); background: #fff; }
+      .send-btn {
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #6366f1, #9333ea);
+        color: #fff; border: none; border-radius: 14px;
+        font-size: 14px; font-weight: 600; cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+        display: flex; align-items: center; gap: 6px;
+        font-family: inherit;
+      }
+      .send-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99,102,241,0.35); }
+      .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+      .send-btn svg { width: 16px; height: 16px; }
+      .input-footer { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 8px; }
+      @media (max-width: 640px) {
+        .header-badges { display: none; }
+        .msg-row { max-width: 92%; }
+        .header-title { font-size: 18px; }
+        .send-btn .send-text { display: none; }
+        .send-btn { padding: 12px 14px; }
+      }
+    </style>
+    <script>
+      (function () {
+        const isInIframe = window.self !== window.top;
+        function applyThemeToDOM(theme) {
+          document.documentElement.classList.remove("light", "dark");
+          document.documentElement.classList.add(theme);
+          document.documentElement.setAttribute("data-theme", theme);
+        }
+        if (isInIframe) {
+          window.addEventListener("message", function (event) {
+            if (event.data && typeof event.data.theme === "string") {
+              const theme = event.data.theme;
+              if (theme === "light" || theme === "dark") { applyThemeToDOM(theme); }
+            }
+          });
+        } else {
+          applyThemeToDOM("light");
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        if (window.self === window.top) return;
+        var reported = {};
+        window.addEventListener("error", function (event) {
+          if (!event || !event.message) return;
+          var key = event.message + "|" + (event.filename || "") + "|" + (event.lineno || 0);
+          if (reported[key]) return;
+          reported[key] = true;
+          try {
+            window.parent.postMessage({ type: "sandbox-runtime-error", payload: { message: String(event.message).slice(0, 500), filename: event.filename || "", lineno: event.lineno || 0, colno: event.colno || 0, stack: event.error && event.error.stack ? String(event.error.stack).slice(0, 2000) : "" } }, "*");
+          } catch (e) {}
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <header class="header">
+        <div class="header-inner">
+          <div class="header-left">
+            <div class="logo">🏥</div>
+            <div>
+              <div class="header-title">NurseAI</div>
+              <div class="header-sub">Your Intelligent Nursing Assistant</div>
+            </div>
+          </div>
+          <div class="header-badges">
+            <span class="badge badge-green"><span class="badge-dot"></span> Online</span>
+            <span class="badge badge-indigo">🧠 AI Powered</span>
+          </div>
+        </div>
+      </header>
+      <div class="chat-area" id="chatArea">
+        <div class="chat-inner" id="chatInner"></div>
+      </div>
+      <div class="topics-bar">
+        <div class="topics-inner" id="topicsBar"></div>
+      </div>
+      <div class="input-area">
+        <div class="input-inner">
+          <div class="input-row">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything about nursing... 💉" autocomplete="off" />
+            <button class="send-btn" id="sendBtn">
+              <span class="send-text">Send</span>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+          </div>
+          <div class="input-footer">NurseAI • Powered by advanced AI knowledge • For educational purposes only</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    // ==================== NURSING KNOWLEDGE BASE ====================
+    var nursingKnowledge = [
+      {
+        keywords: ['vital signs', 'blood pressure', 'heart rate', 'temperature', 'respiratory rate', 'bp', 'hr', 'temp', 'spo2', 'oxygen saturation'],
+        response: '📊 <strong>Normal Vital Signs Reference:</strong><br/>• <strong>Blood Pressure:</strong> 90/60 – 120/80 mmHg (Hypertension: ≥140/90)<br/>• <strong>Heart Rate:</strong> 60–100 bpm (Tachycardia: >100, Bradycardia: <60)<br/>• <strong>Temperature:</strong> 97.8°F – 99.1°F (36.5°C – 37.3°C)<br/>• <strong>Respiratory Rate:</strong> 12–20 breaths/min<br/>• <strong>SpO2:</strong> 95–100% (Below 90% = critical)<br/>• <strong>Pain Scale:</strong> 0–10 (0 = no pain, 10 = worst pain)<br/><br/>⚠️ Always document vital signs promptly and report abnormalities immediately!',
+        category: 'assessment'
+      },
+      {
+        keywords: ['medication', 'drug', 'medicine', 'administer', 'dose', 'dosage', 'rights', 'pharmacology'],
+        response: '💊 <strong>The 10 Rights of Medication Administration:</strong><br/>1. ✅ Right Patient<br/>2. ✅ Right Medication<br/>3. ✅ Right Dose<br/>4. ✅ Right Route<br/>5. ✅ Right Time<br/>6. ✅ Right Documentation<br/>7. ✅ Right Reason<br/>8. ✅ Right Response<br/>9. ✅ Right to Refuse<br/>10. ✅ Right Assessment<br/><br/>🔑 <strong>Key Tips:</strong><br/>• Always verify allergies before administration<br/>• Double-check high-alert medications with another nurse<br/>• Never leave medications unattended<br/>• Document immediately after administration<br/>• Know the mechanism of action for each drug you give',
+        category: 'medication'
+      },
+      {
+        keywords: ['iv', 'intravenous', 'fluid', 'infusion', 'drip', 'line', 'catheter', 'saline', 'lactated ringers'],
+        response: '💉 <strong>IV Therapy Essentials:</strong><br/><br/><strong>Common IV Fluids:</strong><br/>• <strong>Normal Saline (0.9% NaCl):</strong> Isotonic – Volume expansion<br/>• <strong>Lactated Ringer\'s:</strong> Isotonic – Burns, surgery, trauma<br/>• <strong>D5W:</strong> Isotonic→Hypotonic – Provides calories, free water<br/>• <strong>D5NS:</strong> Hypertonic – Dehydration with electrolyte needs<br/>• <strong>D5 ½NS:</strong> Hypotonic – Maintenance fluid<br/><br/><strong>IV Site Assessment (check every hour):</strong><br/>🔍 Look for: Redness, swelling, warmth, pain, streaking<br/>🚨 Signs of infiltration: Cool, pale, swollen at site<br/>🚨 Signs of phlebitis: Red streak, warm, tender<br/><br/><strong>Drip Rate Formula:</strong><br/>Volume (mL) ÷ Time (hours) = mL/hr<br/>For gtt/min: (Volume × Drop Factor) ÷ Time (minutes)',
+        category: 'medication'
+      },
+      {
+        keywords: ['wound', 'dressing', 'pressure ulcer', 'bed sore', 'incision', 'suture', 'staple', 'dehiscence'],
+        response: '🩹 <strong>Wound Care Guide:</strong><br/><br/><strong>Wound Assessment (TIME framework):</strong><br/>• <strong>T</strong> – Tissue type (viable vs non-viable)<br/>• <strong>I</strong> – Infection/Inflammation signs<br/>• <strong>M</strong> – Moisture balance<br/>• <strong>E</strong> – Edge of wound<br/><br/><strong>Pressure Ulcer Staging:</strong><br/>• <strong>Stage 1:</strong> Non-blanchable erythema, intact skin<br/>• <strong>Stage 2:</strong> Partial thickness, blister or shallow crater<br/>• <strong>Stage 3:</strong> Full thickness, subcutaneous fat visible<br/>• <strong>Stage 4:</strong> Full thickness, bone/tendon/muscle exposed<br/>• <strong>Unstageable:</strong> Obscured by slough/eschar<br/>• <strong>Deep Tissue:</strong> Purple/maroon, intact or broken<br/><br/><strong>Dressing Selection:</strong><br/>• Hydrocolloid → Light-moderate exudate<br/>• Foam → Moderate-heavy exudate<br/>• Alginate → Heavy exudate<br/>• Transparent film → Minimal exudate, IV sites<br/>• Gauze → Packing, light drainage',
+        category: 'skills'
+      },
+      {
+        keywords: ['pain', 'analgesic', 'morphine', 'comfort', 'suffering', 'ache', 'hurt', 'pain management'],
+        response: '🎯 <strong>Pain Management Guide:</strong><br/><br/><strong>Pain Assessment Tools:</strong><br/>• <strong>Numeric Scale (0-10):</strong> Adults, alert patients<br/>• <strong>Wong-Baker Faces:</strong> Children 3+, cognitive impairment<br/>• <strong>FLACC Scale:</strong> Infants, non-verbal patients<br/>• <strong>PAINAD:</strong> Dementia patients<br/><br/><strong>WHO Pain Ladder:</strong><br/>1. <strong>Mild (1-3):</strong> Acetaminophen, NSAIDs<br/>2. <strong>Moderate (4-6):</strong> Weak opioids ± non-opioids<br/>3. <strong>Severe (7-10):</strong> Strong opioids ± non-opioids ± adjuvants<br/><br/><strong>Non-Pharmacological Interventions:</strong><br/>🧊 Cold/Heat therapy &nbsp; 🧘 Deep breathing<br/>🎵 Music therapy &nbsp; 💆 Massage/Positioning<br/>🧠 Guided imagery &nbsp; 📱 Distraction techniques<br/><br/>⚠️ <strong>Opioid Safety:</strong><br/>• Monitor RR (hold if <12)<br/>• Have naloxone available<br/>• Assess sedation level<br/>• Monitor for constipation',
+        category: 'assessment'
+      },
+      {
+        keywords: ['safety', 'fall', 'fall risk', 'restraint', 'alarm', 'injury', 'prevent', 'morse'],
+        response: '🛡️ <strong>Patient Safety Protocols:</strong><br/><br/><strong>Fall Prevention:</strong><br/>• Complete fall risk assessment (Morse Fall Scale)<br/>• Bed in lowest position, wheels locked<br/>• Call light within reach<br/>• Non-skid footwear<br/>• Bed/chair alarms for high-risk patients<br/>• Hourly rounding (4 P\'s: Pain, Position, Personal needs, Possessions)<br/>• Clear pathway to bathroom<br/><br/><strong>Restraint Guidelines:</strong><br/>• Least restrictive alternative first<br/>• Physician order required (renew every 24hrs)<br/>• Check circulation every 15-30 min<br/>• Release every 2 hours<br/><br/><strong>Fire Safety (RACE):</strong><br/>• <strong>R</strong> – Rescue anyone in immediate danger<br/>• <strong>A</strong> – Activate alarm<br/>• <strong>C</strong> – Contain the fire (close doors)<br/>• <strong>E</strong> – Extinguish or Evacuate',
+        category: 'safety'
+      },
+      {
+        keywords: ['infection', 'isolation', 'precaution', 'ppe', 'hand hygiene', 'sterile', 'contamination', 'cdiff', 'mrsa', 'vre'],
+        response: '🦠 <strong>Infection Control & Isolation Precautions:</strong><br/><br/><strong>Standard Precautions (ALL patients):</strong><br/>• Hand hygiene (WHO 5 moments)<br/>• Gloves when contact with body fluids<br/>• Mask/eye protection for splash risk<br/><br/><strong>Contact Precautions</strong> 🟡 (MRSA, VRE, C. diff):<br/>• Gown + Gloves<br/>• Dedicated equipment<br/>• Hand hygiene with soap & water (C. diff!)<br/><br/><strong>Droplet Precautions</strong> 🔵 (Influenza, Meningitis):<br/>• Surgical mask within 3 feet<br/><br/><strong>Airborne Precautions</strong> 🔴 (TB, Measles, Varicella):<br/>• N95 respirator<br/>• Negative pressure room<br/>• Keep door closed<br/><br/><strong>Hand Hygiene 5 Moments:</strong><br/>1. Before touching patient<br/>2. Before clean/aseptic procedure<br/>3. After body fluid exposure<br/>4. After touching patient<br/>5. After touching patient surroundings',
+        category: 'safety'
+      },
+      {
+        keywords: ['cardiac', 'heart', 'ecg', 'ekg', 'arrhythmia', 'mi', 'heart attack', 'chest pain', 'cardiac arrest', 'cpr', 'code blue', 'acls'],
+        response: '❤️ <strong>Cardiac Emergency Guide:</strong><br/><br/><strong>Code Blue Response:</strong><br/>1. Verify unresponsive, no pulse<br/>2. Call Code Blue / activate emergency response<br/>3. Begin CPR (30:2 ratio, 100-120/min)<br/>4. Apply defibrillator/AED<br/>5. Follow ACLS algorithm<br/><br/><strong>ACLS Algorithm (Shockable Rhythm):</strong><br/>• CPR → Shock → CPR 2min → Shock → CPR → Epi → Shock<br/>• Amiodarone 300mg first dose, 150mg second<br/><br/><strong>Critical ECG Rhythms:</strong><br/>⚡ <strong>V-Fib/V-Tach:</strong> Defibrillate immediately<br/>⚡ <strong>Asystole:</strong> CPR + Epi, NO shock<br/>⚡ <strong>PEA:</strong> CPR + Epi, NO shock<br/>⚡ <strong>STEMI:</strong> Cath lab activation within 90 min<br/><br/><strong>Chest Pain (PQRST):</strong><br/>• <strong>P</strong>rovoking • <strong>Q</strong>uality • <strong>R</strong>adiation • <strong>S</strong>everity • <strong>T</strong>iming<br/><br/>🚨 MONA for MI: Morphine, Oxygen, Nitroglycerin, Aspirin',
+        category: 'emergency'
+      },
+      {
+        keywords: ['respiratory', 'breathing', 'oxygen', 'ventilator', 'intubation', 'airway', 'copd', 'asthma', 'abg', 'suction'],
+        response: '🫁 <strong>Respiratory Assessment & Management:</strong><br/><br/><strong>ABG Normal Values:</strong><br/>• pH: 7.35–7.45<br/>• PaCO2: 35–45 mmHg<br/>• PaO2: 80–100 mmHg<br/>• HCO3: 22–26 mEq/L<br/>• SaO2: 95–100%<br/><br/><strong>Oxygen Delivery Devices:</strong><br/>• Nasal Cannula: 1–6L (24–44% FiO2)<br/>• Simple Mask: 6–10L (35–50%)<br/>• Venturi Mask: Fixed FiO2 (24–60%)<br/>• Non-Rebreather: 10–15L (60–90%)<br/>• BiPAP: Positive pressure, two levels<br/><br/><strong>Respiratory Distress Signs:</strong><br/>🚨 Accessory muscle use &nbsp; 🚨 Nasal flaring<br/>🚨 Tripod positioning &nbsp; 🚨 SpO2 dropping<br/>🚨 Altered mental status &nbsp; 🚨 Cyanosis (late sign!)<br/><br/><strong>Suctioning:</strong><br/>• Max 10-15 seconds per pass<br/>• Hyperoxygenate before and after<br/>• Use sterile technique • Limit to 3 passes',
+        category: 'assessment'
+      },
+      {
+        keywords: ['diabetes', 'blood sugar', 'glucose', 'insulin', 'hypo', 'hyper', 'a1c', 'diabetic', 'dka'],
+        response: '🩸 <strong>Diabetes Management:</strong><br/><br/><strong>Blood Glucose Targets:</strong><br/>• Fasting: 80–130 mg/dL<br/>• Post-prandial (2hr): <180 mg/dL<br/>• A1C Goal: <7% (individualized)<br/><br/><strong>Hypoglycemia (<70 mg/dL):</strong><br/>🚨 Signs: Tremors, sweating, confusion, tachycardia<br/>✅ Rule of 15: 15g fast carbs → wait 15min → recheck → repeat if needed<br/><br/><strong>Hyperglycemia (>250 mg/dL):</strong><br/>⚠️ DKA Warning: Fruity breath, Kussmaul breathing, nausea<br/>📋 Check ketones if BG >300<br/><br/><strong>Insulin Types:</strong><br/>• <strong>Rapid:</strong> Lispro, Aspart (onset 15min)<br/>• <strong>Short:</strong> Regular (onset 30min) – ONLY IV insulin<br/>• <strong>Intermediate:</strong> NPH (onset 1-2hr)<br/>• <strong>Long:</strong> Glargine, Detemir (no peak)<br/><br/>⚠️ NEVER mix Glargine with other insulins!',
+        category: 'medication'
+      },
+      {
+        keywords: ['mental health', 'depression', 'anxiety', 'suicide', 'psychiatric', 'psych', 'agitation', 'panic'],
+        response: '🧠 <strong>Mental Health Nursing:</strong><br/><br/><strong>Suicide Risk (SAD PERSONS):</strong><br/>• <strong>S</strong>ex • <strong>A</strong>ge • <strong>D</strong>epression • <strong>P</strong>revious attempt<br/>• <strong>E</strong>thanol • <strong>R</strong>ational thinking loss • <strong>S</strong>ocial supports<br/>• <strong>O</strong>rganized plan • <strong>N</strong>o spouse • <strong>S</strong>ickness<br/><br/><strong>De-escalation Techniques:</strong><br/>1. Maintain calm, non-threatening posture<br/>2. Keep distance (2 arm lengths)<br/>3. Use simple, clear language<br/>4. Offer choices when possible<br/>5. Acknowledge feelings • Set clear limits<br/><br/><strong>Therapeutic Communication:</strong><br/>✅ "Tell me more about that"<br/>✅ "How does that make you feel?"<br/>❌ Avoid: "Don\'t worry" / False reassurance<br/><br/><strong>Psych Meds:</strong><br/>• SSRIs: First-line for depression/anxiety<br/>• Lithium: Therapeutic 0.6-1.2 mEq/L (toxicity >1.5)',
+        category: 'assessment'
+      },
+      {
+        keywords: ['tired', 'exhausted', 'hard', 'difficult', 'overwhelmed', 'stressed', 'burnout', 'rough', 'bad day', 'struggling'],
+        response: '💪 <strong>You\'ve Got This, Nurse!</strong><br/><br/>I see you. I know how hard you\'re working right now.<br/><br/>🌟 You chose one of the most noble professions on Earth<br/>🌟 Every patient you care for is lucky to have you<br/>🌟 Your compassion makes a difference even on your hardest days<br/>🌟 It\'s okay to feel overwhelmed – it means you CARE<br/>🌟 You are stronger than you know<br/><br/><strong>Remember:</strong><br/>• You\'ve survived 100% of your worst shifts<br/>• Your knowledge saves lives daily<br/>• It\'s okay to step away for a deep breath<br/>• You deserve the same care you give others<br/><br/>🫂 Take a moment. Breathe. You\'re doing amazing.<br/><br/><em>"Nurses dispense care, hope, comfort, joy, encouragement, and love every single day."</em>',
+        category: 'support'
+      },
+      {
+        keywords: ['compliment', 'praise', 'motivate', 'encourage', 'inspire', 'pick me up', 'motivate me'],
+        response: '',
+        category: 'support',
+        isCompliment: true
+      },
+      {
+        keywords: ['shift', 'report', 'handoff', 'sbars', 'charting', 'documentation', 'organization', 'time management', 'prioritize'],
+        response: '📋 <strong>Shift Survival Guide:</strong><br/><br/><strong>SBAR Report Format:</strong><br/>• <strong>S</strong>ituation: Who, what, where<br/>• <strong>B</strong>ackground: Relevant history<br/>• <strong>A</strong>ssessment: Current findings<br/>• <strong>R</strong>ecommendation: What you need/suggest<br/><br/><strong>Shift Organization Tips:</strong><br/>1. 📝 Arrive 15 min early for brain sheet prep<br/>2. 🎯 Prioritize: ABCs first, then time-sensitive meds<br/>3. 📱 Cluster care (group tasks by room)<br/>4. ⏰ Set medication times on your watch alarm<br/>5. 📊 Chart as you go (don\'t batch at end)<br/>6. 🔄 Hourly rounding prevents call light overload<br/><br/><strong>End of Shift Checklist:</strong><br/>✅ All meds documented<br/>✅ New orders entered/completed<br/>✅ Care plan updated<br/>✅ IV sites assessed & documented<br/>✅ Pain reassessment done<br/>✅ Handoff report prepared',
+        category: 'skills'
+      },
+      {
+        keywords: ['emergency', 'rapid response', 'sepsis', 'stroke', 'trauma', 'anaphylaxis', 'seizure', 'code', 'epinephrine'],
+        response: '🚨 <strong>Emergency Quick Reference:</strong><br/><br/><strong>Sepsis Bundle (1-hour):</strong><br/>1. Measure lactate (remaasure if >2)<br/>2. Blood cultures BEFORE antibiotics<br/>3. Broad-spectrum antibiotics<br/>4. 30mL/kg crystalloid for hypotension<br/>5. Vasopressors if MAP <65 after fluids<br/><br/><strong>Stroke (BE-FAST):</strong><br/>• <strong>B</strong>alance • <strong>E</strong>yes • <strong>F</strong>ace • <strong>A</strong>rms • <strong>S</strong>peech • <strong>T</strong>ime<br/>⏰ Door-to-needle: <60 min for tPA<br/><br/><strong>Anaphylaxis:</strong><br/>1. EPINEPHRINE 0.3-0.5mg IM (first!)<br/>2. Call for help<br/>3. Lay flat, elevate legs<br/>4. Oxygen, IV fluids<br/><br/><strong>Seizure Precautions:</strong><br/>• Pad side rails • Suction & O2 at bedside<br/>• Time the seizure • Protect head, don\'t restrain<br/>• Turn on side after • Never put anything in mouth!',
+        category: 'emergency'
+      },
+      {
+        keywords: ['new nurse', 'new grad', 'nursing school', 'student', 'first year', 'orientation', 'preceptor', 'nclex'],
+        response: '🎓 <strong>New Nurse Survival Guide:</strong><br/><br/><strong>First Year Tips:</strong><br/>1. 🧠 It\'s okay to not know everything – ask!<br/>2. 📝 Keep a pocket notebook for everything<br/>3. 👥 Find a mentor you trust<br/>4. 🕐 Arrive early, stay organized<br/>5. 💪 Your confidence grows with every shift<br/><br/><strong>When Overwhelmed:</strong><br/>• Focus on ONE patient at a time<br/>• ABCs always come first<br/>• Ask for help EARLY<br/>• Safe care > fast care<br/><br/><strong>Things Nobody Tells You:</strong><br/>• Crying in the supply closet is normal (and okay)<br/>• You will make mistakes – learn from them<br/>• The imposter syndrome fades with experience<br/><br/>💡 <strong>Pro Tip:</strong> Keep a "wins journal" – one good thing from each shift.<br/><br/>You chose an incredible path. You\'re already a great nurse! 🌟',
+        category: 'support'
+      },
+      {
+        keywords: ['nutrition', 'diet', 'food', 'nausea', 'vomiting', 'feeding', 'tube', 'tpn', 'ng tube', 'dysphagia'],
+        response: '🍽️ <strong>Nutrition & Feeding Guide:</strong><br/><br/><strong>Diet Types:</strong><br/>• <strong>NPO:</strong> Nothing by mouth<br/>• <strong>Clear Liquids:</strong> Water, broth, jello<br/>• <strong>Full Liquids:</strong> + milk, cream soups<br/>• <strong>Pureed/Mechanical Soft:</strong> Dysphagia<br/>• <strong>Regular:</strong> No restrictions<br/><br/><strong>Tube Feeding:</strong><br/>• Confirm placement: X-ray (gold standard)<br/>• Elevate HOB 30-45° during & 1hr after<br/>• Flush with 30mL water before/after<br/><br/><strong>TPN:</strong><br/>• Central line ONLY<br/>• Never hang >24 hours<br/>• Monitor BG closely<br/>• Don\'t stop abruptly<br/><br/><strong>Nausea Management:</strong><br/>• Ondansetron (Zofran) 4mg IV/PO<br/>• Small, frequent meals • Ginger products',
+        category: 'skills'
+      },
+      {
+        keywords: ['lab', 'labs', 'blood work', 'cbc', 'bmp', 'cmp', 'electrolytes', 'potassium', 'sodium', 'inr', 'ptt', 'troponin', 'bnp', 'creatinine'],
+        response: '🔬 <strong>Critical Lab Values:</strong><br/><br/><strong>CBC:</strong><br/>• WBC: 4,500–11,000/mm³<br/>• Hemoglobin: M 13.5–17.5, F 12.0–16.0<br/>• Platelets: 150,000–400,000/mm³<br/><br/><strong>BMP/CMP:</strong><br/>• Sodium: 135–145 mEq/L ⚠️ <120 or >160 critical<br/>• Potassium: 3.5–5.0 mEq/L ⚠️ <2.5 or >6.5 critical<br/>• BUN: 7–20 mg/dL<br/>• Creatinine: 0.6–1.2 mg/dL<br/>• Glucose: 70–100 mg/dL (fasting)<br/><br/><strong>Coagulation:</strong><br/>• PT: 11–12.5 sec<br/>• INR: 0.8–1.1 (therapeutic 2-3)<br/>• PTT: 25–35 sec (therapeutic 45-70 for heparin)<br/><br/><strong>Cardiac Markers:</strong><br/>• Troponin I: <0.04 ng/mL (elevation = MI)<br/>• BNP: <100 pg/mL (>400 = heart failure)<br/><br/><strong>Critical Values = Call Provider Immediately! 📞</strong>',
+        category: 'assessment'
+      },
+      {
+        keywords: ['hello', 'hi', 'hey', 'good morning', 'good evening', 'good afternoon', 'sup', 'what\'s up', 'howdy'],
+        response: '👋 <strong>Hello, amazing nurse!</strong><br/><br/>I\'m NurseAI – your intelligent nursing assistant! I\'m here to help you with:<br/><br/>🩺 <strong>Clinical Knowledge</strong> – Vital signs, assessments, procedures<br/>💊 <strong>Medication Info</strong> – Drug references, administration guidelines<br/>🚨 <strong>Emergency Protocols</strong> – Code blue, rapid response<br/>📋 <strong>Shift Tips</strong> – Organization, charting, time management<br/>🧠 <strong>Mental Health</strong> – Patient care and YOUR wellbeing<br/>📊 <strong>Lab Values</strong> – Normal ranges and critical values<br/>💪 <strong>Motivation</strong> – Compliments and encouragement!<br/><br/>Just type your question and I\'ll do my best to help! 🌟<br/><br/>What can I help you with today?',
+        category: 'general'
+      },
+      {
+        keywords: ['thank', 'thanks', 'appreciate', 'helpful', 'awesome', 'love this', 'ty'],
+        response: '🥰 <strong>You\'re so welcome!</strong><br/><br/>It makes my day to help an incredible nurse like you!<br/><br/>✨ You are valued<br/>✨ You are skilled<br/>✨ You make a difference every single day<br/>✨ Your patients are fortunate to have you<br/><br/>I\'m always here whenever you need me!<br/><br/>Now go out there and be the amazing nurse you are! 💪🌟',
+        category: 'general'
+      },
+      {
+        keywords: ['renal', 'kidney', 'dialysis', 'ckd', 'aki', 'fluid overload', 'edema', 'urine output'],
+        response: '🫘 <strong>Renal Nursing Guide:</strong><br/><br/><strong>Normal Values:</strong><br/>• BUN: 7–20 mg/dL<br/>• Creatinine: 0.6–1.2 mg/dL<br/>• Urine Output: >30 mL/hr (minimum)<br/><br/><strong>Fluid Overload Assessment:</strong><br/>🔍 Daily weights (same time, same scale)<br/>🔍 Lung sounds (crackles)<br/>🔍 JVD assessment<br/>🔍 Peripheral edema (pitting 1+ to 4+)<br/>🔍 Strict I&O monitoring<br/><br/><strong>Dialysis Nursing:</strong><br/>• Check AV fistula: thrill & bruit (every shift)<br/>• NO BP, blood draws, or IVs on fistula arm<br/>• Monitor for hypotension during treatment<br/>• Weigh before and after dialysis',
+        category: 'assessment'
+      },
+      {
+        keywords: ['neurological', 'neuro', 'gcs', 'brain', 'intracranial', 'icu', 'icp', 'pupil', 'consciousness'],
+        response: '🧠 <strong>Neurological Assessment:</strong><br/><br/><strong>Glasgow Coma Scale (GCS):</strong><br/>• <strong>Eye (4):</strong> 4=Spontaneous, 3=To voice, 2=To pain, 1=None<br/>• <strong>Verbal (5):</strong> 5=Oriented, 4=Confused, 3=Inappropriate, 2=Incomprehensible, 1=None<br/>• <strong>Motor (6):</strong> 6=Obeys, 5=Localizes, 4=Withdraws, 3=Flexion, 2=Extension, 1=None<br/>• Total: 3-15 (≤8 = intubate!)<br/><br/><strong>ICP Monitoring:</strong><br/>• Normal ICP: 5-15 mmHg<br/>• CPP = MAP – ICP (target >60-70)<br/>• Cushing\'s Triad: ↑BP, ↓HR, irregular RR (late sign!)<br/><br/><strong>Pupil Assessment:</strong><br/>• Normal: 2-5mm, equal, round, reactive<br/>• Blown pupil (fixed/dilated) = emergency!<br/>• Pinpoint pupils = opioid effect',
+        category: 'assessment'
+      },
+      {
+        keywords: ['pediatric', 'child', 'baby', 'infant', 'neonate', 'peds', 'developmental', 'milestone'],
+        response: '👶 <strong>Pediatric Nursing Essentials:</strong><br/><br/><strong>Normal Pediatric Vitals:</strong><br/>• Newborn: HR 100-160, RR 30-60<br/>• Infant: HR 90-150, RR 25-50<br/>• Toddler: HR 80-140, RR 20-40<br/>• School-age: HR 60-110, RR 16-24<br/><br/><strong>Pain Assessment:</strong><br/>• FLACC: Infants & non-verbal<br/>• Wong-Baker Faces: Age 3+<br/>• Numeric Scale: Age 8+<br/><br/><strong>Fluid Maintenance (Holliday-Segar):</strong><br/>• First 10kg: 100 mL/kg/day<br/>• Next 10kg: 50 mL/kg/day<br/>• Each kg >20: 20 mL/kg/day<br/><br/><strong>Milestones:</strong><br/>• 2 months: Social smile<br/>• 6 months: Sits with support<br/>• 12 months: Walks, 1-3 words<br/>• 2 years: 2-word phrases, kicks ball',
+        category: 'assessment'
+      },
+      {
+        keywords: ['obstetric', 'labor', 'delivery', 'pregnancy', 'fetal', 'contraction', 'dilation', 'postpartum', 'prenatal'],
+        response: '🤰 <strong>OB/Maternity Nursing:</strong><br/><br/><strong>Stages of Labor:</strong><br/>• <strong>1st:</strong> Onset to full dilation (10cm)<br/>• <strong>2nd:</strong> Full dilation to delivery of baby<br/>• <strong>3rd:</strong> Delivery of baby to delivery of placenta<br/>• <strong>4th:</strong> First 1-4 hours postpartum<br/><br/><strong>FHR Patterns (VEAL CHOP):</strong><br/>• V – Variable decels → C – Cord compression<br/>• E – Early decels → H – Head compression<br/>• A – Accelerations → O – Okay!<br/>• L – Late decels → P – Placental insufficiency<br/><br/><strong>Postpartum (BUBBLE-HE):</strong><br/>• <strong>B</strong>reasts • <strong>U</strong>terus • <strong>B</strong>ladder<br/>• <strong>B</strong>owel • <strong>L</strong>ochia • <strong>E</strong>pisiotomy<br/>• <strong>H</strong>oman\'s sign • <strong>E</strong>motional status<br/><br/>⚠️ PPH: >500mL vag, >1000mL C-section',
+        category: 'assessment'
+      }
+    ];
+
+    var compliments = [
+      "You're not just a nurse – you're a lifesaver, a comforter, and a hero without a cape! 🦸‍♀️",
+      "Your hands heal, your heart cares, and your mind saves lives. You're extraordinary! 💫",
+      "Every patient who crosses your path is luckier because of YOU! 🍀",
+      "The world doesn't realize how much it depends on nurses like you. We do. 🌍",
+      "Your dedication is inspiring. You show up, even when it's hard. That's courage. 💪",
+      "You're the reason patients feel safe in their most vulnerable moments. 🤗",
+      "Behind every recovery story, there's a nurse who never gave up. That's YOU! 📖",
+      "Your knowledge, skill, and compassion make you irreplaceable. 💎",
+      "Even on the hardest days, remember: you chose to make a difference. And you do. EVERY DAY. 🌟",
+      "Nurses aren't just important – they're essential. And YOU are essential! 🏥",
+      "The fact that you're here, learning and growing, shows what an incredible nurse you are! 📚",
+      "Your smile might be the brightest thing a patient sees all day. Keep shining! ☀️",
+      "You handle things most people can't even imagine. That makes you SUPERHUMAN! 🦸",
+      "Every IV you start, every wound you dress, every life you touch – it ALL matters! 💉",
+      "You are the heartbeat of healthcare. Never forget that! ❤️",
+      "Your charting skills alone deserve a standing ovation! 📝👏",
+      "You're the kind of nurse that patients pray for. Take a moment to be proud! 🙏✨",
+      "12-hour shifts? You make it look like a superpower! 🦸‍♀️💪"
+    ];
+
+    var quickTopics = [
+      { label: '💊 Medications', query: 'medication administration rights' },
+      { label: '📊 Vital Signs', query: 'vital signs normal ranges' },
+      { label: '🚨 Emergencies', query: 'emergency protocols' },
+      { label: '💪 Motivate Me', query: 'compliment me' },
+      { label: '🩸 Labs', query: 'lab values' },
+      { label: '🫁 Respiratory', query: 'respiratory assessment' },
+      { label: '❤️ Cardiac', query: 'cardiac arrest cpr' },
+      { label: '🧠 Mental Health', query: 'mental health assessment' },
+      { label: '📋 Shift Tips', query: 'shift organization' },
+      { label: '🩹 Wound Care', query: 'wound care' },
+      { label: '🦠 Infection', query: 'infection control isolation' },
+      { label: '🎓 New Nurse', query: 'new nurse tips' },
+      { label: '🫘 Renal', query: 'renal kidney dialysis' },
+      { label: '🤰 OB/Maternity', query: 'labor delivery obstetric' },
+      { label: '👶 Pediatrics', query: 'pediatric child infant' },
+      { label: '🧠 Neuro', query: 'neurological gcs assessment' }
+    ];
+
+    // ==================== APP LOGIC ====================
+    var isTyping = false;
+
+    function getTimeStr() {
+      return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function addMessage(text, sender) {
+      var chatInner = document.getElementById('chatInner');
+      var row = document.createElement('div');
+      row.className = 'msg-row ' + sender;
+
+      var avatar = document.createElement('div');
+      avatar.className = 'msg-avatar ' + (sender === 'ai' ? 'ai-avatar' : 'user-avatar');
+      avatar.textContent = sender === 'ai' ? '🤖' : '👩‍⚕️';
+
+      var bubble = document.createElement('div');
+      bubble.className = 'msg-bubble ' + (sender === 'ai' ? 'ai-bubble' : 'user-bubble');
+
+      var content = document.createElement('div');
+      content.innerHTML = text;
+
+      var time = document.createElement('div');
+      time.className = 'msg-time';
+      time.textContent = getTimeStr();
+
+      bubble.appendChild(content);
+      bubble.appendChild(time);
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      chatInner.appendChild(row);
+      scrollToBottom();
+    }
+
+    function showTyping() {
+      var chatInner = document.getElementById('chatInner');
+      var row = document.createElement('div');
+      row.className = 'typing-row';
+      row.id = 'typingIndicator';
+      var avatar = document.createElement('div');
+      avatar.className = 'msg-avatar ai-avatar';
+      avatar.textContent = '🤖';
+      var dots = document.createElement('div');
+      dots.className = 'typing-dots';
+      dots.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+      row.appendChild(avatar);
+      row.appendChild(dots);
+      chatInner.appendChild(row);
+      scrollToBottom();
+    }
+
+    function hideTyping() {
+      var el = document.getElementById('typingIndicator');
+      if (el) el.remove();
+    }
+
+    function scrollToBottom() {
+      var chatArea = document.getElementById('chatArea');
+      setTimeout(function() { chatArea.scrollTop = chatArea.scrollHeight; }, 50);
+    }
+
+    function findResponse(userInput) {
+      var lower = userInput.toLowerCase();
+
+      if (lower.indexOf('compliment') !== -1 || lower.indexOf('motivate me') !== -1 || lower.indexOf('i need motivation') !== -1 || lower.indexOf('pick me up') !== -1) {
+        var rc = compliments[Math.floor(Math.random() * compliments.length)];
+        return { response: '🌟 <strong>Here\'s your compliment:</strong><br/><br/>' + rc + '<br/><br/>You deserve to hear this every day! 💖', category: 'support' };
+      }
+
+      var bestMatch = null;
+      var bestScore = 0;
+
+      for (var i = 0; i < nursingKnowledge.length; i++) {
+        var entry = nursingKnowledge[i];
+        if (entry.isCompliment) continue;
+        var score = 0;
+        for (var j = 0; j < entry.keywords.length; j++) {
+          if (lower.indexOf(entry.keywords[j].toLowerCase()) !== -1) {
+            score += entry.keywords[j].length;
+          }
+        }
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = entry;
+        }
+      }
+
+      if (bestMatch && bestScore > 0) {
+        return { response: bestMatch.response, category: bestMatch.category };
+      }
+
+      return {
+        response: '🤔 That\'s a great question! Here are topics I can help with:<br/><br/>📊 <strong>Vital Signs</strong> • 💊 <strong>Medications</strong> • 💉 <strong>IV Therapy</strong><br/>🩹 <strong>Wound Care</strong> • 🎯 <strong>Pain Management</strong> • 🛡️ <strong>Safety</strong><br/>🦠 <strong>Infection Control</strong> • ❤️ <strong>Cardiac</strong> • 🫁 <strong>Respiratory</strong><br/>🩸 <strong>Diabetes</strong> • 🧠 <strong>Mental Health</strong> • 🫘 <strong>Renal</strong><br/>🤰 <strong>OB/Maternity</strong> • 👶 <strong>Pediatrics</strong> • 🧠 <strong>Neuro</strong><br/>📋 <strong>Shift Tips</strong> • 🚨 <strong>Emergencies</strong> • 🔬 <strong>Lab Values</strong><br/>💪 <strong>Motivation</strong> • 🎓 <strong>New Nurse</strong><br/><br/>Try any of these! Or say <strong>"compliment me"</strong> 🌟',
+        category: 'general'
+      };
+    }
+
+    function handleSend() {
+      var input = document.getElementById('chatInput');
+      var text = input.value.trim();
+      if (!text || isTyping) return;
+
+      addMessage(text, 'user');
+      input.value = '';
+      isTyping = true;
+      document.getElementById('sendBtn').disabled = true;
+
+      showTyping();
+
+      var delay = 700 + Math.random() * 1000;
+      setTimeout(function() {
+        hideTyping();
+        var result = findResponse(text);
+        addMessage(result.response, 'ai');
+        isTyping = false;
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('chatInput').focus();
+      }, delay);
+    }
+
+    // ==================== INIT ====================
+    document.addEventListener('DOMContentLoaded', function() {
+      // Render quick topics
+      var topicsBar = document.getElementById('topicsBar');
+      quickTopics.forEach(function(topic) {
+        var btn = document.createElement('button');
+        btn.className = 'topic-btn';
+        btn.textContent = topic.label;
+        btn.onclick = function() {
+          document.getElementById('chatInput').value = topic.query;
+          document.getElementById('chatInput').focus();
+        };
+        topicsBar.appendChild(btn);
+      });
+
+      // Enter key
+      document.getElementById('chatInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleSend();
+        }
+      });
+
+      // Send button
+      document.getElementById('sendBtn').addEventListener('click', handleSend);
+
+      // Welcome message
+      addMessage('👋 <strong>Welcome to NurseAI!</strong><br/><br/>I\'m your intelligent nursing assistant — combining the knowledge of the world\'s best AI systems into one powerful helper designed specifically for nurses.<br/><br/><strong>I can help you with:</strong><br/>🩺 Clinical assessments & vital signs<br/>💊 Medication administration & drug info<br/>🚨 Emergency protocols & rapid response<br/>📋 Shift organization & documentation<br/>🧠 Mental health support (for you AND patients)<br/>📊 Lab values & critical results<br/>🫘 Renal, cardiac, respiratory, neuro & more<br/>🤰 OB/Maternity & 👶 Pediatrics<br/>💪 Daily motivation & compliments<br/>🎓 New nurse guidance & tips<br/><br/>Just type your question below, or try one of the quick topics!<br/><br/>You\'ve got this, nurse! 🌟', 'ai');
+    });
+    </script>
+  </body>
+</html>
