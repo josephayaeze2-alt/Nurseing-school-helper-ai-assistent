@@ -1,1 +1,894 @@
-uutu5uur885858585858
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NurseAI - Your Intelligent Nursing Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --glow: rgba(99, 102, 241, 0.4);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a1a;
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* ========== LANDING PAGE ========== */
+        .landing {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at 50% 0%, #1a1a3e 0%, #0a0a1a 70%);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            overflow: hidden;
+        }
+
+        .landing.hidden {
+            opacity: 0;
+            transform: scale(1.1);
+            pointer-events: none;
+        }
+
+        /* Animated background grid */
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(60px); }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 350px;
+            height: 350px;
+            background: var(--accent);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -3s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--secondary);
+            top: 50%;
+            left: 50%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(20px, 10px) scale(1.02); }
+        }
+
+        /* Sparkles */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 3s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Landing content */
+        .landing-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+            max-width: 700px;
+        }
+
+        .logo-3d {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            box-shadow:
+                0 20px 60px rgba(99, 102, 241, 0.4),
+                0 0 100px rgba(139, 92, 246, 0.2),
+                inset 0 -5px 20px rgba(0,0,0,0.2),
+                inset 0 5px 20px rgba(255,255,255,0.1);
+            animation: logoFloat 4s ease-in-out infinite, logoShine 3s ease-in-out infinite;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
+            25% { transform: translateY(-10px) rotateX(5deg) rotateY(5deg); }
+            50% { transform: translateY(-5px) rotateX(0) rotateY(-5deg); }
+            75% { transform: translateY(-12px) rotateX(-5deg) rotateY(3deg); }
+        }
+
+        @keyframes logoShine {
+            0%, 100% { box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4), 0 0 100px rgba(139, 92, 246, 0.2), inset 0 -5px 20px rgba(0,0,0,0.2), inset 0 5px 20px rgba(255,255,255,0.1); }
+            50% { box-shadow: 0 20px 80px rgba(99, 102, 241, 0.6), 0 0 150px rgba(139, 92, 246, 0.3), inset 0 -5px 20px rgba(0,0,0,0.2), inset 0 5px 30px rgba(255,255,255,0.2); }
+        }
+
+        .landing-title {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 0%, #c7d2fe 50%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .landing-subtitle {
+            font-size: 18px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .landing-subtitle strong {
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Feature cards */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: default;
+            transform-style: preserve-3d;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .feature-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 4px;
+        }
+
+        .feature-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* CTA Button */
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: btnShine 3s ease-in-out infinite;
+        }
+
+        @keyframes btnShine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            50%, 100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(99, 102, 241, 0.6);
+        }
+
+        .cta-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* ========== CHAT PAGE ========== */
+        .app {
+            max-width: 800px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #0f0f23;
+            opacity: 0;
+            transition: opacity 0.6s ease 0.3s;
+        }
+
+        .app.visible {
+            opacity: 1;
+        }
+
+        .header {
+            background: rgba(15, 15, 35, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: linear-gradient(180deg, #0f0f23 0%, #1a1a3e 100%);
+        }
+
+        .chat-area::-webkit-scrollbar { width: 6px; }
+        .chat-area::-webkit-scrollbar-track { background: transparent; }
+        .chat-area::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 3px; }
+        .chat-area::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.5); }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.bot .avatar {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .message.user .avatar {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .bubble {
+            max-width: 75%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .message.bot .bubble {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.9);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top-left-radius: 4px;
+            backdrop-filter: blur(10px);
+        }
+
+        .message.user .bubble {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-top-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .bubble strong {
+            font-weight: 600;
+            color: inherit;
+        }
+
+        .message.bot .bubble strong {
+            color: #a78bfa;
+        }
+
+        .typing {
+            display: none;
+            margin-bottom: 20px;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            border-top-left-radius: 4px;
+            width: fit-content;
+            backdrop-filter: blur(10px);
+        }
+
+        .typing.active {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite;
+            box-shadow: 0 0 6px rgba(99, 102, 241, 0.5);
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-8px); opacity: 1; }
+        }
+
+        .quick-actions {
+            padding: 12px 24px;
+            background: rgba(15, 15, 35, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+
+        .quick-actions::-webkit-scrollbar { height: 0; }
+
+        .quick-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .quick-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .input-area {
+            padding: 16px 24px 20px;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        #userInput::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        #userInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+            background: rgba(255,255,255,0.08);
+        }
+
+        #sendBtn {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        #sendBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .landing-title { font-size: 36px; }
+            .landing-subtitle { font-size: 15px; }
+            .features { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .feature-card { padding: 14px 12px; }
+            .logo-3d { width: 90px; height: 90px; font-size: 42px; border-radius: 24px; }
+            .bubble { max-width: 82%; }
+        }
+
+        @media (max-width: 480px) {
+            .features { grid-template-columns: 1fr 1fr; }
+            .landing-title { font-size: 28px; }
+            .cta-btn { padding: 14px 30px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== LANDING PAGE ========== -->
+    <div class="landing" id="landing">
+        <div class="bg-grid"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+
+        <div class="landing-content">
+            <div class="logo-3d">🩺</div>
+            <h1 class="landing-title">NurseAI</h1>
+            <p class="landing-subtitle">
+                The <strong>intelligent nursing assistant</strong> built for the heroes who save lives every day.
+                Clinical knowledge, quick references, and encouragement — all in one place.
+            </p>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">💊</div>
+                    <div class="feature-title">Medications</div>
+                    <div class="feature-desc">Drug info & the 10 rights</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚨</div>
+                    <div class="feature-title">Emergencies</div>
+                    <div class="feature-desc">ACLS, sepsis, stroke protocols</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Assessments</div>
+                    <div class="feature-desc">Vitals, labs, pain scales</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <div class="feature-title">Mental Health</div>
+                    <div class="feature-desc">De-escalation & support</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔬</div>
+                    <div class="feature-title">Lab Values</div>
+                    <div class="feature-desc">Critical values & ranges</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💪</div>
+                    <div class="feature-title">Motivation</div>
+                    <div class="feature-desc">Because you deserve it</div>
+                </div>
+            </div>
+
+            <button class="cta-btn" onclick="enterChat()">
+                Start Chatting ✨
+            </button>
+        </div>
+    </div>
+
+    <!-- ========== CHAT APP ========== -->
+    <div class="app" id="app">
+        <div class="header">
+            <div class="header-left">
+                <div class="header-logo">🩺</div>
+                <div>
+                    <div class="header-title">NurseAI</div>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="status-dot"></div>
+                <span>Online</span>
+            </div>
+        </div>
+
+        <div class="chat-area" id="chatArea"></div>
+
+        <div class="typing" id="typing">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="quickSend('Vital signs')">📊 Vitals</button>
+            <button class="quick-btn" onclick="quickSend('Medications')">💊 Meds</button>
+            <button class="quick-btn" onclick="quickSend('IV therapy')">💉 IV</button>
+            <button class="quick-btn" onclick="quickSend('Pain management')">🎯 Pain</button>
+            <button class="quick-btn" onclick="quickSend('Infection control')">🦠 Infection</button>
+            <button class="quick-btn" onclick="quickSend('Lab values')">🔬 Labs</button>
+            <button class="quick-btn" onclick="quickSend('Cardiac emergency')">❤️ Cardiac</button>
+            <button class="quick-btn" onclick="quickSend('Diabetes')">🩸 Diabetes</button>
+            <button class="quick-btn" onclick="quickSend('Motivation')">✨ Motivate Me</button>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Ask me anything about nursing..." onkeypress="handleKeyPress(event)">
+            <button id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== SPARKLES ON LANDING ==========
+        function createSparkles() {
+            const landing = document.getElementById('landing');
+            for (let i = 0; i < 30; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 3 + 's';
+                sparkle.style.animationDuration = (2 + Math.random() * 3) + 's';
+                sparkle.style.width = (2 + Math.random() * 4) + 'px';
+                sparkle.style.height = sparkle.style.width;
+                sparkle.style.boxShadow = '0 0 ' + (4 + Math.random() * 6) + 'px rgba(255,255,255,0.5)';
+                landing.appendChild(sparkle);
+            }
+        }
+        createSparkles();
+
+        // ========== ENTER CHAT ==========
+        function enterChat() {
+            const landing = document.getElementById('landing');
+            const app = document.getElementById('app');
+            landing.classList.add('hidden');
+            app.classList.add('visible');
+
+            setTimeout(() => {
+                addMessage("Hello! I'm <strong>NurseAI</strong> 🩺<br><br>I'm here to help you with clinical knowledge, quick references, and support. Ask me about medications, vital signs, emergencies, lab values, or anything nursing-related.<br><br>How can I help you today?", 'bot');
+                document.getElementById('userInput').focus();
+            }, 500);
+        }
+
+        // ========== KNOWLEDGE BASE ==========
+        const knowledgeBase = {
+            "vitals": {
+                keywords: ["vital signs", "bp", "blood pressure", "hr", "heart rate", "temp", "temperature", "resp", "respiration", "spo2", "oxygen saturation", "vitals"],
+                response: "<strong>📊 Normal Vital Signs (Adult):</strong><br><br>• <strong>Heart Rate:</strong> 60–100 bpm<br>• <strong>Blood Pressure:</strong> <120/80 mmHg<br>• <strong>Temperature:</strong> 97.8°F–99.1°F (36.5°C–37.3°C)<br>• <strong>Respiratory Rate:</strong> 12–20 breaths/min<br>• <strong>SpO2:</strong> >95%<br>• <strong>Pain Scale:</strong> 0–10<br><br><em>⚠️ Always assess trends, not just isolated numbers. Report abnormalities immediately.</em>"
+            },
+            "meds": {
+                keywords: ["medication", "drug", "rights", "administer", "dose", "pill", "medicine", "pharmacology"],
+                response: "<strong>💊 The 10 Rights of Medication Administration:</strong><br><br>1. ✅ Right Patient<br>2. ✅ Right Medication<br>3. ✅ Right Dose<br>4. ✅ Right Route<br>5. ✅ Right Time<br>6. ✅ Right Documentation<br>7. ✅ Right Reason<br>8. ✅ Right Response<br>9. ✅ Right to Refuse<br>10. ✅ Right Assessment<br><br><strong>Key Tips:</strong><br>• Always verify allergies<br>• Double-check high-alert meds with another nurse<br>• Document immediately after administration<br>• Know the mechanism of action"
+            },
+            "iv": {
+                keywords: ["iv", "intravenous", "fluid", "saline", "dextrose", "drip", "rate", "infusion"],
+                response: "<strong>💉 IV Therapy Essentials:</strong><br><br><strong>Common IV Fluids:</strong><br>• <strong>NS (0.9% NaCl):</strong> Isotonic – Volume expansion<br>• <strong>LR:</strong> Isotonic – Burns, surgery, trauma<br>• <strong>D5W:</strong> Hypotonic – Free water<br>• <strong>D5NS:</strong> Hypertonic – Dehydration<br><br><strong>IV Site Assessment (every hour):</strong><br>🔍 Redness, swelling, warmth, pain, streaking<br>🚨 Infiltration: Cool, pale, swollen<br>🚨 Phlebitis: Red streak, warm, tender<br><br><strong>Drip Rate:</strong> Volume (mL) ÷ Time (hrs) = mL/hr"
+            },
+            "wound": {
+                keywords: ["wound", "pressure ulcer", "bed sore", "skin", "stage", "healing", "dressing"],
+                response: "<strong>🩹 Wound Care Guide:</strong><br><br><strong>Pressure Ulcer Staging:</strong><br>• <strong>Stage 1:</strong> Non-blanchable erythema<br>• <strong>Stage 2:</strong> Partial thickness, blister<br>• <strong>Stage 3:</strong> Full thickness, fat visible<br>• <strong>Stage 4:</strong> Bone/muscle/tendon exposed<br>• <strong>Unstageable:</strong> Obscured by slough/eschar<br><br><strong>Dressing Selection:</strong><br>• Hydrocolloid → Light-moderate exudate<br>• Foam → Moderate-heavy exudate<br>• Alginate → Heavy exudate<br>• Transparent film → Minimal exudate<br><br><em>Prevention: Reposition q2h, pressure relief, nutrition</em>"
+            },
+            "pain": {
+                keywords: ["pain", "analgesic", "morphine", "opioid", "scale", "assessment", "comfort"],
+                response: "<strong>🎯 Pain Management:</strong><br><br><strong>Assessment Tools:</strong><br>• Numeric Scale (0-10): Adults<br>• Wong-Baker Faces: Children 3+<br>• FLACC: Infants, non-verbal<br>• PAINAD: Dementia patients<br><br><strong>WHO Pain Ladder:</strong><br>1. Mild (1-3): Acetaminophen, NSAIDs<br>2. Moderate (4-6): Weak opioids ± non-opioids<br>3. Severe (7-10): Strong opioids ± adjuvants<br><br><strong>Non-Pharm:</strong> Ice/heat, deep breathing, music, massage, guided imagery<br><br>⚠️ <strong>Opioid Safety:</strong> Monitor RR (hold if <12), have naloxone ready"
+            },
+            "safety": {
+                keywords: ["fall", "safety", "injury", "risk", "prevent", "restraint"],
+                response: "<strong>🛡️ Patient Safety:</strong><br><br><strong>Fall Prevention:</strong><br>• Morse Fall Scale assessment<br>• Bed low, wheels locked<br>• Call light within reach<br>• Non-skid footwear<br>• Bed/chair alarms for high-risk<br>• Hourly rounding (4 P's)<br><br><strong>4 P's of Rounding:</strong><br>1. Pain<br>2. Position<br>3. Personal needs<br>4. Possessions<br><br><strong>Fire Safety (RACE):</strong><br>R – Rescue | A – Activate alarm<br>C – Contain | E – Extinguish/Evacuate"
+            },
+            "infection": {
+                keywords: ["infection", "sterile", "clean", "hand hygiene", "isolation", "ppe", "cauti", "precaution", "mrsa", "cdiff"],
+                response: "<strong>🦠 Infection Control:</strong><br><br><strong>Hand Hygiene 5 Moments:</strong><br>1. Before touching patient<br>2. Before clean/aseptic procedure<br>3. After body fluid exposure<br>4. After touching patient<br>5. After touching surroundings<br><br><strong>Isolation Precautions:</strong><br>🟡 <strong>Contact</strong> (MRSA, C.diff): Gown + Gloves<br>🔵 <strong>Droplet</strong> (Flu, Meningitis): Surgical mask<br>🔴 <strong>Airborne</strong> (TB, Measles): N95, negative pressure<br><br><em>C. diff = Soap & water (NOT sanitizer!)</em>"
+            },
+            "cardiac": {
+                keywords: ["heart", "cardiac", "cpr", "acls", "ecg", "ekg", "arrest", "code", "chest pain", "mi"],
+                response: "<strong>❤️ Cardiac Emergency:</strong><br><br><strong>Code Blue:</strong><br>1. Verify unresponsive, no pulse<br>2. Call Code Blue<br>3. CPR (30:2, 100-120/min)<br>4. Defibrillator/AED<br>5. Follow ACLS algorithm<br><br><strong>Critical Rhythms:</strong><br>⚡ V-Fib/V-Tach → Defibrillate<br>⚡ Asystole → CPR + Epi, NO shock<br>⚡ PEA → CPR + Epi, NO shock<br>⚡ STEMI → Cath lab <90 min<br><br><strong>Chest Pain (PQRST):</strong><br>P – Provoking | Q – Quality<br>R – Radiation | S – Severity | T – Timing<br><br>🚨 <strong>MONA:</strong> Morphine, O2, Nitro, Aspirin"
+            },
+            "resp": {
+                keywords: ["breath", "lung", "asthma", "copd", "abg", "respiratory", "ventilator", "oxygen"],
+                response: "<strong>🫁 Respiratory Assessment:</strong><br><br><strong>ABG Normal Values:</strong><br>• pH: 7.35–7.45<br>• PaCO2: 35–45 mmHg<br>• PaO2: 80–100 mmHg<br>• HCO3: 22–26 mEq/L<br>• SaO2: 95–100%<br><br><strong>O2 Delivery:</strong><br>• Nasal Cannula: 1–6L (24–44%)<br>• Simple Mask: 6–10L (35–50%)<br>• Non-Rebreather: 10–15L (60–90%)<br>• BiPAP: Two pressure levels<br><br><strong>Distress Signs:</strong><br>🚨 Accessory muscle use, nasal flaring<br>🚨 Tripod positioning, SpO2 dropping<br>🚨 Cyanosis (late sign!)"
+            },
+            "diabetes": {
+                keywords: ["diabetes", "insulin", "glucose", "sugar", "hypoglycemia", "hyperglycemia", "dka", "diabetic"],
+                response: "<strong>🩸 Diabetes Management:</strong><br><br><strong>Targets:</strong><br>• Fasting: 80–130 mg/dL<br>• Post-meal (2hr): <180 mg/dL<br>• A1C: <7%<br><br><strong>Hypoglycemia (<70):</strong><br>🚨 Tremors, sweating, confusion<br>✅ Rule of 15: 15g fast carbs → wait 15 min → recheck<br><br><strong>Hyperglycemia (>250):</strong><br>⚠️ DKA: Fruity breath, Kussmaul breathing<br>📋 Check ketones if BG >300<br><br><strong>Insulin Types:</strong><br>• Rapid: Lispro (onset 15min)<br>• Short: Regular (ONLY IV insulin)<br>• Long: Glargine (no peak)<br><br>⚠️ NEVER mix Glargine with other insulins!"
+            },
+            "mental": {
+                keywords: ["psych", "mental health", "depression", "anxiety", "suicide", "agitation"],
+                response: "<strong>🧠 Mental Health Nursing:</strong><br><br><strong>Suicide Risk (SAD PERSONS):</strong><br>S – Sex | A – Age | D – Depression<br>P – Previous attempt | E – Ethanol<br>R – Rational thinking loss | S – Social supports<br>O – Organized plan | N – No spouse | S – Sickness<br><br><strong>De-escalation:</strong><br>1. Stay calm, non-threatening posture<br>2. Keep 2 arm lengths distance<br>3. Simple, clear language<br>4. Offer choices<br>5. Acknowledge feelings<br><br><strong>Therapeutic Communication:</strong><br>✅ \"Tell me more about that\"<br>❌ \"Don't worry\" / False reassurance"
+            },
+            "shift": {
+                keywords: ["shift", "report", "sbar", "handoff", "charting", "documentation", "organization"],
+                response: "<strong>📋 Shift Survival Guide:</strong><br><br><strong>SBAR Report:</strong><br>• <strong>S</strong> – Situation: Who, what, where<br>• <strong>B</strong> – Background: History<br>• <strong>A</strong> – Assessment: Current findings<br>• <strong>R</strong> – Recommendation: What you need<br><br><strong>Organization Tips:</strong><br>1. Arrive 15 min early<br>2. Prioritize: ABCs first<br>3. Cluster care by room<br>4. Chart as you go<br>5. Hourly rounding<br><br><strong>End of Shift Checklist:</strong><br>✅ All meds documented<br>✅ New orders completed<br>✅ IV sites assessed<br>✅ Pain reassessed<br>✅ Handoff ready"
+            },
+            "emergency": {
+                keywords: ["sepsis", "stroke", "anaphylaxis", "shock", "emergency", "rapid response", "seizure"],
+                response: "<strong>🚨 Emergency Reference:</strong><br><br><strong>Sepsis (1-hour bundle):</strong><br>1. Measure lactate<br>2. Blood cultures BEFORE antibiotics<br>3. Broad-spectrum antibiotics<br>4. 30mL/kg crystalloid if hypotensive<br>5. Vasopressors if MAP <65<br><br><strong>Stroke (BE-FAST):</strong><br>B – Balance | E – Eyes | F – Face<br>A – Arms | S – Speech | T – Time<br>⏰ tPA window: <60 min<br><br><strong>Anaphylaxis:</strong><br>1. EPINEPHRINE 0.3-0.5mg IM (FIRST!)<br>2. Call for help<br>3. O2, IV fluids<br><br><strong>Seizures:</strong><br>• Time it • Protect head • Don't restrain<br>• Turn on side after • Nothing in mouth!"
+            },
+            "labs": {
+                keywords: ["lab", "value", "potassium", "sodium", "hemoglobin", "platelet", "creatinine", "cbc", "bmp", "inr"],
+                response: "<strong>🔬 Critical Lab Values:</strong><br><br><strong>CBC:</strong><br>• WBC: 4,500–11,000<br>• Hemoglobin: M 13.5–17.5, F 12–16<br>• Platelets: 150k–400k<br><br><strong>BMP:</strong><br>• Sodium: 135–145 ⚠️ <120 or >160 critical<br>• Potassium: 3.5–5.0 ⚠️ <2.5 or >6.5 critical<br>• BUN: 7–20<br>• Creatinine: 0.6–1.2<br>• Glucose: 70–100 (fasting)<br><br><strong>Coagulation:</strong><br>• INR: 0.8–1.1 (therapeutic 2-3)<br>• PTT: 25–35 (therapeutic 45-70 for heparin)<br><br><strong>Cardiac:</strong><br>• Troponin: <0.04 (elevation = MI)<br>• BNP: <100 (>400 = heart failure)<br><br>📞 <strong>Critical values = Call provider immediately!</strong>"
+            },
+            "renal": {
+                keywords: ["kidney", "renal", "dialysis", "urine", "output", "fluid overload", "edema"],
+                response: "<strong>🫘 Renal Nursing:</strong><br><br><strong>Normal Values:</strong><br>• BUN: 7–20 mg/dL<br>• Creatinine: 0.6–1.2 mg/dL<br>• Urine Output: >30 mL/hr (minimum)<br><br><strong>Fluid Overload Signs:</strong><br>🔍 Daily weights (same time, scale)<br>🔍 Lung crackles<br>🔍 JVD<br>🔍 Peripheral edema (pitting 1+ to 4+)<br>🔍 Strict I&O<br><br><strong>Dialysis Nursing:</strong><br>• Check AV fistula: thrill & bruit every shift<br>• NO BP/blood draws/IVs on fistula arm<br>• Monitor for hypotension<br>• Weigh before & after"
+            },
+            "neuro": {
+                keywords: ["brain", "neuro", "gcs", "coma", "head injury", "icp", "pupil", "seizure"],
+                response: "<strong>🧠 Neurological Assessment:</strong><br><br><strong>Glasgow Coma Scale:</strong><br>• <strong>Eye (4):</strong> 4=Spontaneous, 3=Voice, 2=Pain, 1=None<br>• <strong>Verbal (5):</strong> 5=Oriented, 4=Confused, 3=Words, 2=Sounds, 1=None<br>• <strong>Motor (6):</strong> 6=Obeys, 5=Localizes, 4=Withdraws, 3=Flexion, 2=Extension, 1=None<br>• Total: 3–15 (<strong>≤8 = intubate!</strong>)<br><br><strong>ICP:</strong><br>• Normal: 5–15 mmHg<br>• Cushing's Triad: ↑BP, ↓HR, irregular RR<br><br><strong>Pupils:</strong><br>• Normal: 2-5mm, equal, reactive<br>• Blown (fixed/dilated) = EMERGENCY<br>• Pinpoint = opioids"
+            },
+            "peds": {
+                keywords: ["child", "pediatric", "baby", "infant", "neonate", "peds"],
+                response: "<strong>👶 Pediatric Essentials:</strong><br><br><strong>Normal Vitals by Age:</strong><br>• Newborn: HR 100-160, RR 30-60<br>• Infant: HR 90-150, RR 25-50<br>• Toddler: HR 80-140, RR 20-40<br>• School-age: HR 60-110, RR 16-24<br><br><strong>Pain Assessment:</strong><br>• FLACC: Infants & non-verbal<br>• Wong-Baker Faces: Age 3+<br>• Numeric: Age 8+<br><br><strong>Fluid Maintenance:</strong><br>• First 10kg: 100 mL/kg/day<br>• Next 10kg: 50 mL/kg/day<br>• Each kg >20: 20 mL/kg/day<br><br>⚠️ Fever in <3 months = MEDICAL EMERGENCY"
+            },
+            "ob": {
+                keywords: ["pregnant", "labor", "delivery", "birth", "postpartum", "maternity", "fetal", "contraction"],
+                response: "<strong>🤰 OB/Maternity:</strong><br><br><strong>Stages of Labor:</strong><br>• 1st: Onset → full dilation (10cm)<br>• 2nd: Full dilation → delivery<br>• 3rd: Delivery → placenta<br>• 4th: First 1-4 hrs postpartum<br><br><strong>FHR (VEAL CHOP):</strong><br>• V – Variable → C – Cord compression<br>• E – Early → H – Head compression<br>• A – Accelerations → O – Okay!<br>• L – Late → P – Placental insufficiency<br><br><strong>Postpartum (BUBBLE-HE):</strong><br>B – Breasts | U – Uterus | B – Bladder<br>B – Bowel | L – Lochia | E – Episiotomy<br>H – Homan's | E – Emotional<br><br>⚠️ PPH: >500mL vag, >1000mL C-section"
+            },
+            "motivation": {
+                keywords: ["motivation", "compliment", "good job", "stress", "burnout", "encourage", "tired", "exhausted", "overwhelmed"],
+                response: ""
+            },
+            "newbie": {
+                keywords: ["new nurse", "student", "advice", "tips", "beginner", "nursing school", "nclex"],
+                response: "<strong>🎓 New Nurse Guide:</strong><br><br><strong>First Year Tips:</strong><br>1. 🧠 It's okay to not know everything – ask!<br>2. 📝 Keep a pocket notebook<br>3. 👥 Find a mentor you trust<br>4. 💪 Confidence grows with every shift<br><br><strong>When Overwhelmed:</strong><br>• Focus on ONE patient at a time<br>• ABCs always first<br>• Ask for help EARLY<br>• Safe care > fast care<br><br><strong>Things Nobody Tells You:</strong><br>• Crying in the supply closet is normal<br>• You will make mistakes – learn from them<br>• Imposter syndrome fades with experience<br><br>💡 <strong>Pro Tip:</strong> Keep a \"wins journal\" – one good thing per shift.<br><br>You chose an incredible path. You're already a great nurse! 🌟"
+            }
+        };
+
+        const compliments = [
+            "You're not just a nurse – you're a lifesaver, a comforter, and a hero without a cape! 🦸‍♀️",
+            "Your hands heal, your heart cares, and your mind saves lives. You're extraordinary! 💫",
+            "Every patient who crosses your path is luckier because of YOU! 🍀",
+            "The world doesn't realize how much it depends on nurses like you. We do. 🌍",
+            "Your dedication is inspiring. You show up, even when it's hard. That's courage. 💪",
+            "You're the reason patients feel safe in their most vulnerable moments. 🤗",
+            "Behind every recovery story, there's a nurse who never gave up. That's YOU! 📖",
+            "Your knowledge, skill, and compassion make you irreplaceable. 💎",
+            "Even on the hardest days, you chose to make a difference. And you do. EVERY DAY. 🌟",
+            "Nurses aren't just important – they're essential. And YOU are essential! 🏥",
+            "Your smile might be the brightest thing a patient sees all day. Keep shining! ☀️",
+            "You handle things most people can't even imagine. That makes you SUPERHUMAN! 🦸",
+            "Every IV you start, every wound you dress, every life you touch – it ALL matters! 💉",
+            "You are the heartbeat of healthcare. Never forget that! ❤️",
+            "12-hour shifts? You make it look like a superpower! 🦸‍♀️💪"
+        ];
+
+        // ========== CHAT LOGIC ==========
+        const chatArea = document.getElementById('chatArea');
+        const userInput = document.getElementById('userInput');
+        const typingEl = document.getElementById('typing');
+        const sendBtn = document.getElementById('sendBtn');
+        let isProcessing = false;
+
+        function addMessage(text, sender) {
+            const msg = document.createElement('div');
+            msg.className = `message ${sender}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = sender === 'bot' ? '🤖' : '👩‍⚕️';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerHTML = text;
+
+            msg.appendChild(avatar);
+            msg.appendChild(bubble);
+            chatArea.appendChild(msg);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function showTyping() {
+            typingEl.classList.add('active');
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingEl.classList.remove('active');
+        }
+
+        function findResponse(input) {
+            const lower = input.toLowerCase();
+
+            // Motivation/compliment check
+            if (lower.includes('compliment') || lower.includes('motivate me') || lower.includes('motivation') || lower.includes('pick me up') || lower.includes('tired') || lower.includes('exhausted') || lower.includes('overwhelmed') || lower.includes('burnout') || lower.includes('bad day')) {
+                const c = compliments[Math.floor(Math.random() * compliments.length)];
+                return `✨ <strong>Here's your compliment:</strong><br><br>${c}<br><br>You deserve to hear this every day! 💖`;
+            }
+
+            // Find best match
+            let best = null;
+            let bestScore = 0;
+
+            for (const [key, data] of Object.entries(knowledgeBase)) {
+                if (key === 'motivation') continue;
+                let score = 0;
+                for (const kw of data.keywords) {
+                    if (lower.includes(kw)) score += kw.length;
+                }
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = data;
+                }
+            }
+
+            if (best && bestScore > 0) return best.response;
+
+            return "I'm not sure about that specific topic. Try asking about:<br><br>📊 Vital Signs • 💊 Medications • 💉 IV Therapy<br>🩹 Wound Care • 🎯 Pain • 🦠 Infection<br>❤️ Cardiac • 🫁 Respiratory • 🩸 Diabetes<br>🧠 Mental Health • 🫘 Renal • 🧠 Neuro<br>👶 Pediatrics • 🤰 OB/Maternity<br>🔬 Labs • 🚨 Emergencies • 📋 Shift Tips<br>💪 Motivation<br><br>Or say <strong>\"motivate me\"</strong> for encouragement! ✨";
+        }
+
+        async function processMessage(text) {
+            if (!text.trim() || isProcessing) return;
+            isProcessing = true;
+            sendBtn.disabled = true;
+
+            addMessage(text, 'user');
+            userInput.value = '';
+            showTyping();
+
+            await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
+
+            const response = findResponse(text);
+            hideTyping();
+            addMessage(response, 'bot');
+
+            isProcessing = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+
+        function sendMessage() { processMessage(userInput.value); }
+        function quickSend(text) { processMessage(text); }
+        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+    </script>
+</body>
+</html>
